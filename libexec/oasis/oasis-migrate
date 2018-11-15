@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+$PSQL -f ./data/schema.sql

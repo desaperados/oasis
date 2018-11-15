@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+id=$(seth --to-word $1)
+offer=$(seth call $OASIS 'offers(uint)(uint, address, uint, address, address, uint64)' $id)
+
+lot=$(seth --from-wei $(seth --to-dec ${offer:0:64}))
+lotGem=${offer:65:40}
+bid=$(seth --from-wei $(seth --to-dec ${offer:106:64}))
+bidGem=${offer:171:40}
+maker=${offer:212:40}
+era=$(seth --to-dec ${offer:253:64})
+
+$PSQL <<SQL
+  INSERT INTO public.offer (id, lot, lotGem, bid, bidGem, maker, era)
+  VALUES ($(seth --to-dec $id), $lot, '$lotGem', $bid, '$bidGem', '$maker', $era)
+  ON CONFLICT (id) DO UPDATE SET lot = $lot, bid = $bid, era = $era;
+SQL

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+
+latest=$(seth --to-dec $(seth call $OASIS 'last_offer_id()(uint256)'));
+
+for ((i=$latest;i>=0;i--)); do
+  read era <<< $(psql -t -c "select era from offer where id = $i")
+  if [[ $era -gt 0 ]]; then
+    oasis --cache-offer $i
+  elif [[ -z "$era" ]]; then
+    oasis --cache-offer $i
+  else
+    echo "skipping: $i"
+  fi
+done

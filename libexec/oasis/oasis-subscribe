@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+
+block=$(seth block latest number)
+block=$(($block - 100))
+block=$(seth --to-hex $block)
+
+seth logs-rpc --follow $OASIS $block |
+
+while read -r event;
+do
+  topics=($(jshon -e topics -a -u <<<"$event"))
+  if [[ "${#topics[@]}" -gt 1 ]]; then
+    id=$(seth --to-dec ${topics[1]});
+    if [[ "${#id}" -lt 8 ]]; then
+      oasis --cache-offer $id
+    fi
+  fi
+done
+
+

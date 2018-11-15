@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+export ETH_RPC_URL="68.183.102.40:8545";
+export PGHOST=${PGHOST-localhost}
+export PGPORT=${PGPORT-5432}
+export PGDATABASE=${PGDATABASE-oasis}
+export PGUSER=${PGUSER-dc}
+export PGPASSWORD=${PGPASSWORD-dc}
+
+export PSQL="psql -X --echo-all --set AUTOCOMMIT=on --set ON_ERROR_STOP=on"
+export OASIS="0x14fbca95be7e99c15cc2996c6c9d841e54b79425";
+
+if command -v "${0##*/}-$1" &>/dev/null; then
+  exec "${0##*/}-$1" "${@:2}"
+else
+  echo "Invalid command"
+fi

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+$PSQL \
+    -c "select id, lot, lotGem, bid, bidGem, maker, era from api.offer where era > 0" \
+    -t \
+| while read -a offer; do
+  echo "${offer[@]}"
+done
