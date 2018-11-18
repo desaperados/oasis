@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+
+echo
+
+$PSQL \
+  -c "select id, lot, lotSymbol, bid, bidSymbol, round(price, 2), type, left(maker, 6), to_timestamp(era) as era \
+      from api.offer \
+      order by era desc \
+      limit 15" \
+  -t \
+  -P format=aligned \
+  -P pager=off \
+  --echo-errors

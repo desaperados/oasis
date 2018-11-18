@@ -51,7 +51,8 @@ CREATE OR REPLACE VIEW api.offer AS (
     COALESCE(lotToken.symbol, 'XXX') AS lotSymbol,
     COALESCE(bidToken.symbol, 'XXX') AS bidSymbol,
     (
-      CASE WHEN m.base = lotToken.symbol THEN o.bid / o.lot
+      CASE WHEN o.bid = 0 THEN 0
+      WHEN m.base = lotToken.symbol THEN o.bid / o.lot
       WHEN m.base = bidToken.symbol THEN o.lot / o.bid
       ELSE NULL
       END
