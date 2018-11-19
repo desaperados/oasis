@@ -2,18 +2,23 @@
 set -e
 
 block=$(seth block latest number)
-block=$(($block - 100))
+block=$(($block - 50))
 block=$(seth --to-hex $block)
 
 seth logs-rpc --follow $OASIS $block |
 
 while read -r event;
 do
-  topics=($(jshon -e topics -a -u <<<"$event"))
-  if [[ "${#topics[@]}" -gt 1 ]]; then
-    id=$(seth --to-dec ${topics[1]});
-    if [[ "${#id}" -lt 8 ]]; then
-      oasis --cache-offer $id
+  topics=$(echo $event | jq '.topics')
+  id=$(echo $event | jq -r '.topics[1]')
+  if [[ "$id" != "null" ]]; then
+    dec=$(seth --to-dec $id);
+    if [[ "${#dec}" -lt 8 ]]; then
+      echo "> $dec"
+      oasis --cache-offer $dec &
+    else
+      echo "> Unknown event"
+      echo $topics
     fi
   fi
 done
