@@ -10,12 +10,13 @@ seth logs-rpc --follow $OASIS $block |
 while read -r event;
 do
   sig=$(echo $event | jq -r '.topics[0]')
+  blk=$(echo $event | jq -r '.blockNumber')
   case $sig in
   "0xa2c251311b1a7a475913900a2a73dc9789a21b04bc737e050bbc506dd4eb3488")
     data=$(echo $event | jq -r '.data')
     id=$(seth --to-dec $data);
     echo "LogItemUpdate($id)"
-    oasis --cache-offer $id &
+    oasis --cache-offer $id $blk &
     ;;
   "0x9577941d28fff863bfbee4694a6a4a56fb09e169619189d2eaa750b5b4819995")
     topic=$(echo $event | jq -r '.topics[1]')
