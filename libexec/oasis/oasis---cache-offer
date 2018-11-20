@@ -15,5 +15,5 @@ era=$(seth --to-dec ${offer:253:64})
 $PSQL <<SQL
   INSERT INTO public.offer (id, lot, lotGem, bid, bidGem, maker, era)
   VALUES ($(seth --to-dec $id), $lot, '$lotGem', $bid, '$bidGem', '$maker', $era)
-  ON CONFLICT (id) DO UPDATE SET lot = $lot, bid = $bid, era = $era;
+  ON CONFLICT (id) DO UPDATE SET lot = $lot, lotGem = '$lotGem', bid = $bid, bidGem = '$bidGem', era = $era;
 SQL

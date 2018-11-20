@@ -2,7 +2,7 @@
 set -e
 
 block=$(seth block latest number)
-block=$(($block - 100))
+block=$(($block - 10))
 block=$(seth --to-hex $block)
 
 seth logs-rpc --follow $OASIS $block |
