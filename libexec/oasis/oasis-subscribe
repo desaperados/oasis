@@ -10,12 +10,13 @@ seth logs-rpc --follow $OASIS $block |
 while read -r event;
 do
   topics=$(echo $event | jq '.topics')
+  block=$(echo $event | jq -r '.blockNumber')
   id=$(echo $event | jq -r '.topics[1]')
   if [[ "$id" != "null" ]]; then
     dec=$(seth --to-dec $id);
     if [[ "${#dec}" -lt 8 ]]; then
       echo "> $dec"
-      oasis --cache-offer $dec &
+      oasis --cache-offer $dec $block &
     else
       echo "> Unknown event"
       echo $topics
