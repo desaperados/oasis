@@ -2,26 +2,35 @@
 set -e
 
 block=$(seth block latest number)
-block=$(($block - 50))
+block=$(($block - 100))
 block=$(seth --to-hex $block)
 
 seth logs-rpc --follow $OASIS $block |
 
 while read -r event;
 do
-  topics=$(echo $event | jq '.topics')
-  block=$(echo $event | jq -r '.blockNumber')
-  id=$(echo $event | jq -r '.topics[1]')
-  if [[ "$id" != "null" ]]; then
-    dec=$(seth --to-dec $id);
-    if [[ "${#dec}" -lt 8 ]]; then
-      echo "> $dec"
-      oasis --cache-offer $dec $block &
-    else
-      echo "> Unknown event"
-      echo $topics
-    fi
-  fi
+  sig=$(echo $event | jq -r '.topics[0]')
+  case $sig in
+  "0xa2c251311b1a7a475913900a2a73dc9789a21b04bc737e050bbc506dd4eb3488")
+    data=$(echo $event | jq -r '.data')
+    id=$(seth --to-dec $data);
+    echo "LogItemUpdate($id)"
+    oasis --cache-offer $id &
+    ;;
+  "0x9577941d28fff863bfbee4694a6a4a56fb09e169619189d2eaa750b5b4819995")
+    topic=$(echo $event | jq -r '.topics[1]')
+    id=$(seth --to-dec $topic);
+    echo "LogKill($id)"
+    ;;
+  "0x773ff502687307abfa024ac9f62f9752a0d210dac2ffd9a29e38e12e2ea82c82")
+    topic=$(echo $event | jq -r '.topics[1]')
+    id=$(seth --to-dec $topic);
+    echo "LogMake($id)"
+    ;;
+  "0x3383e3357c77fd2e3a4b30deea81179bc70a795d053d14d5b7f2f01d0fd4596f")
+    data=$(echo $event | jq -r '.data')
+    id=$(seth --to-dec ${data:0:66})
+    echo "LogTake($id)"
+    ;;
+  esac
 done
-
-

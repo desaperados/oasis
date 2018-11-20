@@ -2,8 +2,7 @@
 set -e
 
 id=$(seth --to-word $1)
-block=${2:-latest}
-offer=$(seth call -B $block $OASIS 'offers(uint)(uint, address, uint, address, address, uint64)' $id)
+offer=$(seth call $OASIS 'offers(uint)(uint, address, uint, address, address, uint64)' $id)
 
 lot=$(seth --from-wei $(seth --to-dec ${offer:0:64}))
 lotGem=${offer:65:40}
