@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+
+echo
+
+# $PSQL \
+#   -c "(select id, round(lot, 2), lotSymbol, round(bid, 2), bidSymbol, \
+#       round(price, 2), type, left(maker, 6), to_timestamp(era) \
+#       from api.offer where era > 0 and market in ('WETHDAI', 'MKRDAI', 'WETHMKR'))" \
+#   -t \
+#   -P format=aligned \
+#   -P pager=off \
+#   --echo-errors
+
+$PSQL \
+  -c "select * \
+      from api.offer o \
+      left join api.offer o1 on o1.lotSymbol = o.bidSymbol \
+      where o.era > 0 and o1.era > 0 and o.lotSymbol = 'DAI' limit 1" \
+  -t \
+  -P format=aligned \
+  -P pager=on \
+  --echo-errors

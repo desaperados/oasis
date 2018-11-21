@@ -6,28 +6,18 @@ market=${1:-WETHDAI}
 echo
 
 $PSQL \
-  -c "select * from (select id, round(lot, 2), lotSymbol, round(bid, 2), bidSymbol, round(price, 2) as price, type, left(maker, 6), to_timestamp(era) \
+  -c "(select * from (select id, round(lot, 2), lotSymbol, round(bid, 2), bidSymbol, \
+      round(price, 2) as price, type, left(maker, 6), to_timestamp(era) \
       from api.offer where era > 0 and market = '$market' and type = 'ask' \
       order by market, type, price asc \
-      limit 15) as q order by price desc" \
-  -t \
-  -P format=aligned \
-  -P pager=off \
-  --echo-errors
-
-$PSQL \
-  -c "select id, round(lot, 2), lotSymbol, round(bid, 2), bidSymbol, round(price, 2), type, left(maker, 6), to_timestamp(era) \
+      limit 15) as q order by price desc) \
+      union all \
+      (select id, round(lot, 2), lotSymbol, round(bid, 2), bidSymbol, \
+      round(price, 2), type, left(maker, 6), to_timestamp(era) \
       from api.offer where era > 0 and market = '$market' and type = 'bid' \
       order by market, type, price desc \
-      limit 15" \
+      limit 15)" \
   -t \
   -P format=aligned \
   -P pager=off \
   --echo-errors
-
-
-
-
-# | while read -a offer; do
-#   echo "${offer[@]}"
-# done
